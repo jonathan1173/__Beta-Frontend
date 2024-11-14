@@ -8,6 +8,7 @@ import Login from './Pages/login';
 import NavBar from './components/NavBar';
 import PrivateRoute from './contexts/PrivateRoute';
 import Home from './Pages/Home';
+import ChallengesList from './Pages/ChallengesList';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             {/* Ruta privada */}
             <Route element={<PrivateRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/challenges" element={<ChallengesList />} />
             </Route>
           </Routes>
         </AuthProvider>
