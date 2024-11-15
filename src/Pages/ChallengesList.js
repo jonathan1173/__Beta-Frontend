@@ -13,29 +13,36 @@ const ChallengesList = () => {
     fetchChallenges();
   }, []);
 
-  const fetchChallenges = async (url = 'http://localhost:8000/beta/challenges/challenges/', category = '') => {
+  const fetchChallenges = async (
+    url = 'http://localhost:8000/beta/challenges/challenges/',
+    category = '',
+    difficulty = '',
+    language = ''
+  ) => {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        params: { category },
+        params: { category, difficulty, language },
       });
 
-      setChallenges(response.data.results.map(challenge => ({
-        ...challenge,
-        likes_count: challenge.likes_count || 0,
-        dislikes_count: challenge.dislikes_count || 0,
-        user_liked: challenge.user_liked || false,
-        user_disliked: challenge.user_disliked || false,
-        user_favorited: challenge.user_favorited || false,
-      })));
+      setChallenges(
+        response.data.results.map(challenge => ({
+          ...challenge,
+          likes_count: challenge.likes_count || 0,
+          dislikes_count: challenge.dislikes_count || 0,
+          user_liked: challenge.user_liked || false,
+          user_disliked: challenge.user_disliked || false,
+          user_favorited: challenge.user_favorited || false,
+        }))
+      );
 
       // Actualizar la paginación con las URLs correctas de next y previous
       setPagination({
         next: response.data.next,
-        previous: response.data.previous
+        previous: response.data.previous,
       });
     } catch (err) {
       setError('No se pudieron cargar los desafíos. Inicia sesión.');
@@ -80,20 +87,30 @@ const ChallengesList = () => {
     fetchChallenges('http://localhost:8000/beta/challenges/challenges/', category);
   };
 
+  const handleDifficultyClick = (difficulty) => {
+    fetchChallenges('http://localhost:8000/beta/challenges/challenges/', '', difficulty);
+  };
+
+  const handleLanguageClick = (language) => {
+    fetchChallenges('http://localhost:8000/beta/challenges/challenges/', '', '', language);
+    
+  };
+
   if (error) return <p>{error}</p>;
 
   return (
     <div>
       <h2>Lista de Desafíos</h2>
       <ul>
-        {challenges.map((challenge) => (
-          <li className='m-7 border border-sky-400' key={challenge.id}>
+        {challenges.map(challenge => (
+          <li className="m-7 border border-sky-400" key={challenge.id}>
             <Link to={`/challenges/${challenge.id}`}>{challenge.title}</Link>
 
             <div className="text-gray-600">
               <div className="flex items-center space-x-2">
                 <span>Categorías:</span>
-                {challenge.categories?.length ?
+
+                {challenge.categories?.length ? (
                   challenge.categories.map((category, index) => (
                     <span
                       key={index}
@@ -101,13 +118,38 @@ const ChallengesList = () => {
                       onClick={() => handleCategoryClick(category.name)}
                     >
                       <Tag className="text-black" />
-                      <span className='text-black'>{category.name}</span>
+                      <span className="text-black">{category.name}</span>
                     </span>
-                  )) : '- Sin categorías -'}
+                  ))
+                ) : (
+                  '- Sin categorías -'
+                )}
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <span>Dificultad:</span>
+                <span
+                  className="flex items-center space-x-1 rounded-md bg-slate-500 p-1 border border-black cursor-pointer"
+                  onClick={() => handleDifficultyClick(challenge.difficulty)}
+                >
+                  <Tag className="text-black" />
+                  <span className="text-black">{challenge.difficulty}</span>
+                </span>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <span>Lenguaje:</span>
+                <span
+                  className="flex items-center space-x-1 rounded-md bg-slate-500 p-1 border border-black cursor-pointer"
+                  onClick={() => handleLanguageClick(challenge.language)}
+                >
+                  <Tag className="text-black" />
+                  <span className="text-black">{challenge.language}</span>
+                </span>
               </div>
             </div>
 
-            <div className='flex space-x-4'>
+            <div className="flex space-x-4">
               <button onClick={() => handleAction(challenge.id, 'like')}>
                 <ThumbsUp className={challenge.user_liked ? 'text-blue-500' : ''} />
                 <span>{challenge.likes_count}</span>
