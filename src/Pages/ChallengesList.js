@@ -5,8 +5,6 @@ import { Link } from 'react-router-dom';
 import { ThumbsUp, ThumbsDown, Tag, Heart } from 'lucide-react';
 import Filters from '../components/Filters';
 
-
-
 const ChallengesList = () => {
   const [challenges, setChallenges] = useState([]);
   const [error, setError] = useState(null);
@@ -29,6 +27,7 @@ const ChallengesList = () => {
         params: { category, difficulty, language },
       });
 
+      console.log("Response from API:", response.data); 
       setChallenges(
         response.data.results.map(challenge => ({
           ...challenge,
