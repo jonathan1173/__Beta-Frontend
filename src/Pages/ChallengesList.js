@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { ThumbsUp, ThumbsDown, Tag, Heart } from 'lucide-react';
+import Filters from '../components/Filters';
+
+
 
 const ChallengesList = () => {
   const [challenges, setChallenges] = useState([]);
@@ -22,9 +25,7 @@ const ChallengesList = () => {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         params: { category, difficulty, language },
       });
 
@@ -39,7 +40,6 @@ const ChallengesList = () => {
         }))
       );
 
-      // Actualizar la paginación con las URLs correctas de next y previous
       setPagination({
         next: response.data.next,
         previous: response.data.previous,
@@ -56,9 +56,7 @@ const ChallengesList = () => {
         `http://localhost:8000/beta/challenges/challenges/${challengeId}/action/${action}/`,
         {},
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
@@ -66,14 +64,7 @@ const ChallengesList = () => {
         prevChallenges.map(challenge => {
           if (challenge.id === challengeId) {
             const { user_liked, user_disliked, user_favorited, likes_count, dislikes_count } = response.data;
-            return {
-              ...challenge,
-              user_liked,
-              user_disliked,
-              user_favorited,
-              likes_count,
-              dislikes_count,
-            };
+            return { ...challenge, user_liked, user_disliked, user_favorited, likes_count, dislikes_count };
           }
           return challenge;
         })
@@ -93,13 +84,18 @@ const ChallengesList = () => {
 
   const handleLanguageClick = (language) => {
     fetchChallenges('http://localhost:8000/beta/challenges/challenges/', '', '', language);
-    
   };
 
   if (error) return <p>{error}</p>;
 
   return (
     <div>
+      <Filters
+      handleCategoryClick={handleCategoryClick}
+      handleLanguageClick={handleLanguageClick}
+      handleDifficultyClick={handleDifficultyClick}
+      
+    />
       <h2>Lista de Desafíos</h2>
       <ul>
         {challenges.map(challenge => (
@@ -109,7 +105,6 @@ const ChallengesList = () => {
             <div className="text-gray-600">
               <div className="flex items-center space-x-2">
                 <span>Categorías:</span>
-
                 {challenge.categories?.length ? (
                   challenge.categories.map((category, index) => (
                     <span
