@@ -1,35 +1,36 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { ThumbsUp, ThumbsDown, Tag, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import Filters from '../components/FiltersMenu';
-import { motion } from 'framer-motion';
 
 export default function ChallengesList() {
   const [challenges, setChallenges] = useState([]);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ next: null, previous: null });
+  const [filters, setFilters] = useState({
+    category: '',
+    difficulty: '',
+    language: '',
+    favorites: false,
+    sort_by_likes: false,
+  });
 
-  useEffect(() => {
-    fetchChallenges();
-  }, []);
-
-  const fetchChallenges = async (
-    url = 'http://localhost:8000/beta/challenges/challenges/',
-    category = '',
-    difficulty = '',
-    language = ''
-  ) => {
+  // Usamos useCallback para memorizar la función fetchChallenges
+  const fetchChallenges = useCallback(async (url = 'http://localhost:8000/beta/challenges/challenges/') => {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { category, difficulty, language },
+        params: {
+          category: filters.category,
+          difficulty: filters.difficulty,
+          language: filters.language,
+          favorites: filters.favorites ? 'true' : undefined,
+          sort_by_likes: filters.sort_by_likes ? 'true' : undefined,
+        },
       });
 
-      console.log("Response from API:", response.data);
       setChallenges(
         response.data.results.map(challenge => ({
           ...challenge,
@@ -48,7 +49,11 @@ export default function ChallengesList() {
     } catch (err) {
       setError('No se pudieron cargar los desafíos. Inicia sesión.');
     }
-  };
+  }, [filters]); // La función depende de filters
+
+  useEffect(() => {
+    fetchChallenges();
+  }, [filters, fetchChallenges]); // Añadimos fetchChallenges como dependencia
 
   const handleAction = async (challengeId, action) => {
     try {
@@ -76,15 +81,23 @@ export default function ChallengesList() {
   };
 
   const handleCategoryClick = (category) => {
-    fetchChallenges('http://localhost:8000/beta/challenges/challenges/', category);
+    setFilters(prev => ({ ...prev, category }));
   };
 
   const handleDifficultyClick = (difficulty) => {
-    fetchChallenges('http://localhost:8000/beta/challenges/challenges/', '', difficulty);
+    setFilters(prev => ({ ...prev, difficulty }));
   };
 
   const handleLanguageClick = (language) => {
-    fetchChallenges('http://localhost:8000/beta/challenges/challenges/', '', '', language);
+    setFilters(prev => ({ ...prev, language }));
+  };
+
+  const toggleFavorites = () => {
+    setFilters(prev => ({ ...prev, favorites: !prev.favorites }));
+  };
+
+  const toggleSortByLikes = () => {
+    setFilters(prev => ({ ...prev, sort_by_likes: !prev.sort_by_likes }));
   };
 
   if (error) return <p>{error}</p>;
@@ -92,123 +105,88 @@ export default function ChallengesList() {
   return (
     <div>
       <Filters
+         filters={filters} 
         handleCategoryClick={handleCategoryClick}
         handleLanguageClick={handleLanguageClick}
         handleDifficultyClick={handleDifficultyClick}
+        handleToggleFavorite={toggleFavorites}
+        handleToggleSortbyLikes={toggleSortByLikes}
       />
+      <div>
+        <button onClick={toggleFavorites}>
+          {filters.favorites ? 'Ver Todos' : 'Ver Favoritos'}
+        </button>
+        <button onClick={toggleSortByLikes}>
+          {filters.sort_by_likes ? 'Ordenar por Relevancia' : 'Ordenar por Likes'}
+        </button>
+      </div>
       <h2>Lista de Desafíos</h2>
-      <ul >
-
+      <ul>
         {challenges.map(challenge => (
-          <motion.li
-            key={challenge.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className='m-10 border border-white'>
+          <li key={challenge.id} className="m-10 border border-red-100">
+            <div>
               <Link to={`/challenges/${challenge.id}`}>
                 {challenge.title}
               </Link>
               <div>
                 <span>Dificultad:</span>
-                <motion.span
-                  onClick={() => handleDifficultyClick(challenge.difficulty)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
+                <span onClick={() => handleDifficultyClick(challenge.difficulty)}>
                   <Tag />
                   {challenge.difficulty}
-                </motion.span>
+                </span>
               </div>
               <div>
                 <div>
                   <span>Categorías:</span>
                   {challenge.categories?.length ? (
                     challenge.categories.map((category, index) => (
-                      <motion.span
-                        key={index}
-                        onClick={() => handleCategoryClick(category.name)}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
+                      <span key={index} onClick={() => handleCategoryClick(category.name)}>
                         <Tag />
                         {category.name}
-                      </motion.span>
+                      </span>
                     ))
                   ) : (
                     '- Sin categorías -'
                   )}
                 </div>
-
-
-
                 <div>
                   <span>Lenguaje:</span>
-                  <motion.span
-                    onClick={() => handleLanguageClick(challenge.language)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
+                  <span onClick={() => handleLanguageClick(challenge.language)}>
                     <Tag />
                     {challenge.language}
-                  </motion.span>
+                  </span>
                 </div>
               </div>
-
               <div>
-                <motion.button
-                  onClick={() => handleAction(challenge.id, 'like')}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
+                <button onClick={() => handleAction(challenge.id, 'like')}>
                   <ThumbsUp />
                   <span>{challenge.likes_count}</span>
-                </motion.button>
-
-                <motion.button
-                  onClick={() => handleAction(challenge.id, 'dislike')}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
+                </button>
+                <button onClick={() => handleAction(challenge.id, 'dislike')}>
                   <ThumbsDown />
                   <span>{challenge.dislikes_count}</span>
-                </motion.button>
-
-                <motion.button
-                  onClick={() => handleAction(challenge.id, 'favorite')}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
+                </button>
+                <button onClick={() => handleAction(challenge.id, 'favorite')}>
                   <Heart />
                   <span>{challenge.user_favorited ? 'Favorito' : 'Agregar a Favoritos'}</span>
-                </motion.button>
+                </button>
               </div>
             </div>
-          </motion.li>
+          </li>
         ))}
       </ul>
-
       <div>
         {pagination.previous && (
-          <motion.button
-            onClick={() => fetchChallenges(pagination.previous)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
+          <button onClick={() => fetchChallenges(pagination.previous)}>
             <ChevronLeft />
             Página Anterior
-          </motion.button>
+          </button>
         )}
         {pagination.next && (
-          <motion.button
-            onClick={() => fetchChallenges(pagination.next)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
+          <button onClick={() => fetchChallenges(pagination.next)}>
             Página Siguiente
             <ChevronRight />
-          </motion.button>
+          </button>
         )}
       </div>
     </div>

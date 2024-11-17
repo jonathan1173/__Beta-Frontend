@@ -5,10 +5,10 @@ function Layout({ children, title = "Beta" }) {
     document.title = title;
 
     const body = document.body;
-    body.classList.add("bg-gray-500", "dark:bg-gray-900");
+    body.classList.add("bg-gray-100", "dark:bg-gray-100");
 
     return () => {
-      body.classList.remove("bg-gray-500", "dark:bg-gray-900");
+      body.classList.remove("bg-gray-100", "dark:bg-gray-100");
     };
   }, [title]);
 
