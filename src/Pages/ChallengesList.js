@@ -1,11 +1,13 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { ThumbsUp, ThumbsDown, Tag, Heart } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Tag, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import Filters from '../components/FiltersMenu';
+import { motion } from 'framer-motion';
 
-const ChallengesList = () => {
+export default function ChallengesList() {
   const [challenges, setChallenges] = useState([]);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ next: null, previous: null });
@@ -27,7 +29,7 @@ const ChallengesList = () => {
         params: { category, difficulty, language },
       });
 
-      console.log("Response from API:", response.data); 
+      console.log("Response from API:", response.data);
       setChallenges(
         response.data.results.map(challenge => ({
           ...challenge,
@@ -90,94 +92,125 @@ const ChallengesList = () => {
   return (
     <div>
       <Filters
-      handleCategoryClick={handleCategoryClick}
-      handleLanguageClick={handleLanguageClick}
-      handleDifficultyClick={handleDifficultyClick}
-      
-    />
+        handleCategoryClick={handleCategoryClick}
+        handleLanguageClick={handleLanguageClick}
+        handleDifficultyClick={handleDifficultyClick}
+      />
       <h2>Lista de Desafíos</h2>
-      <ul>
+      <ul >
+
         {challenges.map(challenge => (
-          <li className="m-7 border border-sky-400" key={challenge.id}>
-            <Link to={`/challenges/${challenge.id}`}>{challenge.title}</Link>
-
-            <div className="text-gray-600">
-              <div className="flex items-center space-x-2">
-                <span>Categorías:</span>
-                {challenge.categories?.length ? (
-                  challenge.categories.map((category, index) => (
-                    <span
-                      key={index}
-                      className="flex items-center space-x-1 rounded-md bg-slate-500 p-1 border border-black cursor-pointer"
-                      onClick={() => handleCategoryClick(category.name)}
-                    >
-                      <Tag className="text-black" />
-                      <span className="text-black">{category.name}</span>
-                    </span>
-                  ))
-                ) : (
-                  '- Sin categorías -'
-                )}
-              </div>
-
-              <div className="flex items-center space-x-2">
+          <motion.li
+            key={challenge.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className='m-10 border border-white'>
+              <Link to={`/challenges/${challenge.id}`}>
+                {challenge.title}
+              </Link>
+              <div>
                 <span>Dificultad:</span>
-                <span
-                  className="flex items-center space-x-1 rounded-md bg-slate-500 p-1 border border-black cursor-pointer"
+                <motion.span
                   onClick={() => handleDifficultyClick(challenge.difficulty)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <Tag className="text-black" />
-                  <span className="text-black">{challenge.difficulty}</span>
-                </span>
+                  <Tag />
+                  {challenge.difficulty}
+                </motion.span>
+              </div>
+              <div>
+                <div>
+                  <span>Categorías:</span>
+                  {challenge.categories?.length ? (
+                    challenge.categories.map((category, index) => (
+                      <motion.span
+                        key={index}
+                        onClick={() => handleCategoryClick(category.name)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Tag />
+                        {category.name}
+                      </motion.span>
+                    ))
+                  ) : (
+                    '- Sin categorías -'
+                  )}
+                </div>
+
+
+
+                <div>
+                  <span>Lenguaje:</span>
+                  <motion.span
+                    onClick={() => handleLanguageClick(challenge.language)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Tag />
+                    {challenge.language}
+                  </motion.span>
+                </div>
               </div>
 
-              <div className="flex items-center space-x-2">
-                <span>Lenguaje:</span>
-                <span
-                  className="flex items-center space-x-1 rounded-md bg-slate-500 p-1 border border-black cursor-pointer"
-                  onClick={() => handleLanguageClick(challenge.language)}
+              <div>
+                <motion.button
+                  onClick={() => handleAction(challenge.id, 'like')}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <Tag className="text-black" />
-                  <span className="text-black">{challenge.language}</span>
-                </span>
+                  <ThumbsUp />
+                  <span>{challenge.likes_count}</span>
+                </motion.button>
+
+                <motion.button
+                  onClick={() => handleAction(challenge.id, 'dislike')}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <ThumbsDown />
+                  <span>{challenge.dislikes_count}</span>
+                </motion.button>
+
+                <motion.button
+                  onClick={() => handleAction(challenge.id, 'favorite')}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Heart />
+                  <span>{challenge.user_favorited ? 'Favorito' : 'Agregar a Favoritos'}</span>
+                </motion.button>
               </div>
             </div>
-
-            <div className="flex space-x-4">
-              <button onClick={() => handleAction(challenge.id, 'like')}>
-                <ThumbsUp className={challenge.user_liked ? 'text-blue-500' : ''} />
-                <span>{challenge.likes_count}</span>
-              </button>
-
-              <button onClick={() => handleAction(challenge.id, 'dislike')}>
-                <ThumbsDown className={challenge.user_disliked ? 'text-red-500' : ''} />
-                <span>{challenge.dislikes_count}</span>
-              </button>
-
-              <button onClick={() => handleAction(challenge.id, 'favorite')}>
-                <Heart className={challenge.user_favorited ? 'text-yellow-500' : ''} />
-                <span>{challenge.user_favorited ? 'Favorito' : 'Agregar a Favoritos'}</span>
-              </button>
-            </div>
-          </li>
+          </motion.li>
         ))}
       </ul>
 
-      {/* Botones de paginación */}
-      <div className="pagination-buttons flex justify-between mt-4">
+      <div>
         {pagination.previous && (
-          <button onClick={() => fetchChallenges(pagination.previous)} className="m-2 p-2 bg-blue-500 text-white rounded">
+          <motion.button
+            onClick={() => fetchChallenges(pagination.previous)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <ChevronLeft />
             Página Anterior
-          </button>
+          </motion.button>
         )}
         {pagination.next && (
-          <button onClick={() => fetchChallenges(pagination.next)} className="m-2 p-2 bg-blue-500 text-white rounded">
+          <motion.button
+            onClick={() => fetchChallenges(pagination.next)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             Página Siguiente
-          </button>
+            <ChevronRight />
+          </motion.button>
         )}
       </div>
     </div>
   );
-};
-
-export default ChallengesList;
+}
