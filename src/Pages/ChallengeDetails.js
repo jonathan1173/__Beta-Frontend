@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import CodeEditor from '../services/CodeEditor';
+import CodeEditor from '../services/CodeEditor'; // Asegúrate de tener este componente
 
 const ChallengeDetail = () => {
   const { id } = useParams(); // Obtiene el ID del desafío desde la URL
@@ -9,7 +9,9 @@ const ChallengeDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [solutionCode, setSolutionCode] = useState(''); // Estado para la solución
-  const [testCode, setTestCode] = useState(''); // Estado para las pruebas
+  const [testCode, setTestCode] = useState(''); // Estado para el código de prueba
+  const [testResults, setTestResults] = useState(null); // Estado para los resultados de las pruebas
+  const [testError, setTestError] = useState(null); // Estado para errores en la ejecución
 
   useEffect(() => {
     const fetchChallenge = async () => {
@@ -17,7 +19,7 @@ const ChallengeDetail = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:8000/beta/challenges/challenges/${id}/`,
+          `http://localhost:8000/beta/challenges/challenges/${id}/`, // Asegúrate de que la URL es correcta
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -26,8 +28,8 @@ const ChallengeDetail = () => {
         );
         console.log('Datos recibidos:', response.data);
         setChallenge(response.data);
-        setSolutionCode(response.data.solution || '');
-        setTestCode(response.data.test || '');
+        setSolutionCode(response.data.solution || ''); // Cargar el código de la solución si está disponible
+        setTestCode(response.data.test || ''); // Cargar el código de prueba si está disponible
       } catch (err) {
         console.error('Error:', err);
         setError('Error al cargar el desafío.');
@@ -43,37 +45,37 @@ const ChallengeDetail = () => {
     setSolutionCode(newCode); // Actualiza el estado del código de la solución
   };
 
-  const handleTestChange = (newCode) => {
-    setTestCode(newCode); // Actualiza el estado del código de la prueba
+  const handleTestCodeChange = (newTestCode) => {
+    setTestCode(newTestCode); // Actualiza el estado del código de prueba
   };
 
-  const handleSaveSolution = async () => {
+  const handleTestExecution = async () => {
     const token = localStorage.getItem('access_token');
+
     try {
-      const response = await axios.patch(
-        `http://localhost:8000/beta/challenges/challenges/${id}/`,
-        {
-          solution: solutionCode,
-        },
+      // Realiza la solicitud POST al backend con la solución y el código de prueba
+      const response = await axios.post(
+        `http://localhost:8000/beta/challenges/challenges/${id}/execute/`,
+        { solution: solutionCode, test: testCode }, // Enviar ambos códigos (solución y prueba)
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
         }
       );
-      console.log('Solución guardada:', response.data);
-      // Actualiza el desafío con la solución guardada en el backend
-      setChallenge((prevChallenge) => ({
-        ...prevChallenge,
-        solution: response.data.solution,
-      }));
-      
-      // Alerta que se ha guardado la solución correctamente
-      alert('¡Solución guardada exitosamente!');
 
+      // Actualiza los resultados de las pruebas
+      if (response.data.output) {
+        setTestResults(response.data.output); // Aquí esperamos que `output` contenga los resultados de las pruebas
+        setTestError(null);
+      } else {
+        setTestError('No se recibieron resultados.');
+      }
     } catch (err) {
-      console.error('Error al guardar la solución:', err);
-      setError('Error al guardar la solución.');
+      console.error('Error al ejecutar la solución:', err);
+      setTestError('Error al ejecutar la solución. Verifique su código.');
+      setTestResults(null);
     }
   };
 
@@ -90,6 +92,16 @@ const ChallengeDetail = () => {
         <p><strong>Categorías:</strong> {challenge.categories.map(cat => cat.name).join(', ')}</p>
         <p><strong>Likes:</strong> {challenge.likes_count}</p>
         <p><strong>Dislikes:</strong> {challenge.dislikes_count}</p>
+        <div>
+          <h2>Resultados de la Prueba</h2>
+          {testResults ? (
+            <div>
+              <p>{testResults}</p> {/* Mostramos los resultados obtenidos */}
+            </div>
+          ) : (
+            testError && <p className="text-red-500">{testError}</p>
+          )}
+        </div>
       </section>
 
       <section className="w-[50%]">
@@ -99,13 +111,19 @@ const ChallengeDetail = () => {
           onChange={handleSolutionChange}
           language={challenge.language || 'python'}
         />
-        <h2>Prueba</h2>
+
+        <h2>Código de Prueba</h2>
         <CodeEditor
           value={testCode}
-          onChange={handleTestChange}
-          language={challenge.language || 'python'}
+          onChange={handleTestCodeChange}
+          language="python" // Cambiar el lenguaje según el desafío
         />
-        <button onClick={handleSaveSolution}>Guardar Solución</button>
+
+        <button onClick={handleTestExecution} className="mt-4 p-2 bg-blue-500 text-white">
+          Ejecutar Pruebas
+        </button>
+
+
       </section>
     </div>
   );
