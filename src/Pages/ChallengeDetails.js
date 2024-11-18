@@ -51,12 +51,13 @@ const ChallengeDetail = () => {
 
   const handleTestExecution = async () => {
     const token = localStorage.getItem('access_token');
+    const language = challenge.language || 'python'; // Usa el lenguaje del desafío
 
     try {
-      // Realiza la solicitud POST al backend con la solución y el código de prueba
+      // Realiza la solicitud POST al backend con la solución, el código de prueba y el lenguaje
       const response = await axios.post(
         `http://localhost:8000/beta/challenges/challenges/${id}/execute/`,
-        { solution: solutionCode, test: testCode }, // Enviar ambos códigos (solución y prueba)
+        { solution: solutionCode, test: testCode, language: language }, // Enviar el lenguaje también
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -67,6 +68,7 @@ const ChallengeDetail = () => {
 
       // Actualiza los resultados de las pruebas
       if (response.data.output) {
+        // Suponemos que response.data.output es un string o un array de resultados
         setTestResults(response.data.output); // Aquí esperamos que `output` contenga los resultados de las pruebas
         setTestError(null);
       } else {
@@ -95,9 +97,14 @@ const ChallengeDetail = () => {
         <div>
           <h2>Resultados de la Prueba</h2>
           {testResults ? (
-            <div>
-              <p>{testResults}</p> {/* Mostramos los resultados obtenidos */}
-            </div>
+            Array.isArray(testResults) ? (
+              // Si testResults es un array, mostrar cada resultado en un párrafo
+              testResults.map((result, index) => (
+                <p className='border border-red-500 m-4' key={index}>{result}</p>
+              ))
+            ) : (
+              <p>{testResults}</p> // Si es un solo resultado, simplemente mostrarlo
+            )
           ) : (
             testError && <p className="text-red-500">{testError}</p>
           )}
@@ -109,21 +116,19 @@ const ChallengeDetail = () => {
         <CodeEditor
           value={solutionCode}
           onChange={handleSolutionChange}
-          language={challenge.language || 'python'}
+          language={challenge.language || 'python'} // Se adapta al lenguaje del desafío
         />
 
         <h2>Código de Prueba</h2>
         <CodeEditor
           value={testCode}
           onChange={handleTestCodeChange}
-          language="python" // Cambiar el lenguaje según el desafío
+          language={challenge.language || 'python'} // Se adapta al lenguaje del desafío
         />
 
         <button onClick={handleTestExecution} className="mt-4 p-2 bg-blue-500 text-white">
           Ejecutar Pruebas
         </button>
-
-
       </section>
     </div>
   );
