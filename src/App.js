@@ -10,6 +10,7 @@ import PrivateRoute from './contexts/PrivateRoute';
 import Home from './Pages/Home';
 import ChallengesList from './Pages/ChallengesList';
 import Layout from './layouts/Layout'; // Asegúrate de tener este componente creado
+import ChallengeDetails from './Pages/ChallengeDetails';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
               <Route element={<PrivateRoute />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/challenges" element={<ChallengesList />} />
+                <Route path="/challenges/:id" element={<ChallengeDetails />} />
               </Route>
             </Routes>
           </Layout>
