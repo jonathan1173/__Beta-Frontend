@@ -1,0 +1,5 @@
+#AB7052 → bg-amber-600
+#667519 → bg-olive-700
+#7D9B6E → bg-green-400
+#88B3E8 → bg-blue-400
+#D29742 → bg-yellow-500 
