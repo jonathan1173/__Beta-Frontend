@@ -1,10 +1,7 @@
-// DarkModeContext.js
 import React, { createContext, useState, useEffect } from 'react';
 
-// Crear el contexto
 export const DarkModeContext = createContext();
 
-// Proveedor de contexto para envolver la aplicación
 export const DarkModeProvider = ({ children }) => {
   // Estado para almacenar si el modo oscuro está activado
   const [isDarkMode, setIsDarkMode] = useState(() => {

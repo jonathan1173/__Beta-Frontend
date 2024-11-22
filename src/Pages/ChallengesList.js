@@ -17,7 +17,7 @@ export default function ChallengesList() {
   });
 
   // Usamos useCallback para memorizar la función fetchChallenges
-  const fetchChallenges = useCallback(async (url = 'http://localhost:8000/beta/challenges/challenges/') => {
+  const fetchChallenges = useCallback(async (url = 'https://beta-api-cs50.vercel.app/beta/challenges/challenges/') => {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.get(url, {
@@ -59,7 +59,7 @@ export default function ChallengesList() {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.post(
-        `http://localhost:8000/beta/challenges/challenges/${challengeId}/action/${action}/`,
+        `https://beta-api-cs50.vercel.app/beta/challenges/challenges/${challengeId}/action/${action}/`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },

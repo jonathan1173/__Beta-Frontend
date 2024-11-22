@@ -21,7 +21,7 @@ const FiltersMenu = ({
             try {
                 setLoading(true);
                 const token = localStorage.getItem('access_token');
-                const response = await axios.get(`http://localhost:8000/beta/challenges/filters/`, {
+                const response = await axios.get(`https://beta-api-cs50.vercel.app/beta/challenges/filters/`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const { categories, languages, difficulties } = response.data.filters || {};

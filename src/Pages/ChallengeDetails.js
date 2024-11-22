@@ -16,7 +16,7 @@ const ChallengeDetail = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:8000/beta/challenges/challenges/${id}/`, // Asegúrate de que la URL es correcta
+          `https://beta-api-cs50.vercel.app/beta/challenges/challenges/${id}/`, // Asegúrate de que la URL es correcta
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -22,14 +22,14 @@ export default function Register() {
     }
 
     try {
-      const response = await axios.post('http://localhost:8000/beta/access/register/', {
+      const response = await axios.post('https://beta-api-cs50.vercel.app/beta/access/register/', {
         username,
         email,
         password,
       });
 
       if (response.status === 201) {
-        const tokenResponse = await axios.post('http://localhost:8000/beta/token/', {
+        const tokenResponse = await axios.post('https://beta-api-cs50.vercel.app/beta/token/', {
           username,
           password,
         });

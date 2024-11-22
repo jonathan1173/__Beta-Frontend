@@ -15,7 +15,7 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/beta/access/login/', {
+      const response = await axios.post('https://beta-api-cs50.vercel.app/beta/access/login/', {
         username,
         password,
       });
