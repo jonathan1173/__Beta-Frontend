@@ -158,17 +158,22 @@ export default function ChallengesList() {
                 </div>
               </div>
               <div>
-                <button onClick={() => handleAction(challenge.id, 'like')}>
+                <button onClick={() => handleAction(challenge.id, 'like')} 
+                className={challenge.user_liked ? 'bg-blue-500' : 'btn'}>
                   <ThumbsUp />
                   <span>{challenge.likes_count}</span>
                 </button>
-                <button onClick={() => handleAction(challenge.id, 'dislike')}>
+                <button onClick={() => handleAction(challenge.id, 'dislike')}
+                  className={challenge.user_disliked ? 'bg-red-500' : 'btn'}
+                  >
                   <ThumbsDown />
                   <span>{challenge.dislikes_count}</span>
                 </button>
-                <button onClick={() => handleAction(challenge.id, 'favorite')}>
+                <button onClick={() => handleAction(challenge.id, 'favorite')} className={challenge.user_favorited ? 'bg-yellow-500' : 'btn'}>
                   <Heart />
-                  <span>{challenge.user_favorited ? 'Favorito' : 'Agregar a Favoritos'}</span>
+                  <span>{challenge.user_favorited ? 'Favorito' : 'Agregar a Favoritos'}
+                  
+                  </span>
                 </button>
               </div>
             </div>
