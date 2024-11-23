@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { ThumbsUp, ThumbsDown, Tag, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ThumbsUp, ThumbsDown, Tag, Heart, ChevronLeft, ChevronRight, Loader } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Filters from '../components/FiltersMenu';
 
 export default function ChallengesList() {
   const [challenges, setChallenges] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ next: null, previous: null });
   const resetFilters = () => {
     setFilters({
@@ -26,9 +27,8 @@ export default function ChallengesList() {
     sort_by_likes: false,
   });
 
-
-
   const fetchChallenges = useCallback(async (url = 'https://beta-api-cs50.vercel.app/beta/challenges/challenges/') => {
+    setLoading(true);
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.get(url, {
@@ -57,8 +57,11 @@ export default function ChallengesList() {
         next: response.data.next,
         previous: response.data.previous,
       });
+      setError(null);
     } catch (err) {
       setError('No se pudieron cargar los desafíos. Inicia sesión.');
+    } finally {
+      setLoading(false);
     }
   }, [filters]);
 
@@ -111,8 +114,6 @@ export default function ChallengesList() {
     setFilters(prev => ({ ...prev, sort_by_likes: !prev.sort_by_likes }));
   };
 
-  if (error) return <p className="text-red-500 text-center mt-4">{error}</p>;
-
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -128,8 +129,20 @@ export default function ChallengesList() {
     show: { opacity: 1, y: 0 }
   };
 
+  if (error) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex items-center justify-center min-h-[50vh]"
+      >
+        <p className="text-red-500 dark:text-red-400 text-lg font-medium">{error}</p>
+      </motion.div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div className="min-h-screen bg-white dark:bg-zinc-900 p-6 transition-colors duration-300">
       <Filters
         filters={filters}
         handleCategoryClick={handleCategoryClick}
@@ -139,134 +152,165 @@ export default function ChallengesList() {
         handleToggleSortbyLikes={toggleSortByLikes}
         handleRestFilter={resetFilters}
       />
-      
-y
 
-      <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-8">Lista de Desafíos</h2>
+      <h2 className="text-3xl font-bold text-center text-zinc-900 dark:text-white mb-8">
+        Lista de Desafíos
+      </h2>
 
-      <motion.ul
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="space-y-4 max-w-4xl mx-auto"
-      >
-        {challenges.map(challenge => (
-          <motion.li
-            key={challenge.id}
-            variants={item}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200"
+      {loading ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center justify-center min-h-[50vh] space-y-4"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           >
-            <div className="p-6">
-              <Link
-                to={`/challenges/${challenge.id}`}
-                className="text-xl font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
+            <Loader className="w-8 h-8 text-fuchsia-500 dark:text-emerald-400" />
+          </motion.div>
+          <p className="text-zinc-600 dark:text-zinc-400 text-lg font-medium">
+            Cargando desafíos...
+          </p>
+        </motion.div>
+      ) : (
+        <AnimatePresence>
+          <motion.ul
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="space-y-6 max-w-4xl mx-auto"
+          >
+            {challenges.map(challenge => (
+              <motion.li
+                key={challenge.id}
+                variants={item}
+                className="bg-zinc-50 dark:bg-zinc-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
               >
-                {challenge.title}
-              </Link>
-
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
-                  <span>Dificultad:</span>
-                  <button
-                    onClick={() => handleDifficultyClick(challenge.difficulty)}
-                    className="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                <div className="p-6">
+                  <Link
+                    to={`/challenges/${challenge.id}`}
+                    className="text-xl font-bold text-zinc-900 dark:text-white hover:text-fuchsia-500 dark:hover:text-emerald-400 transition-colors duration-300"
                   >
-                    <Tag className="w-4 h-4 mr-1" />
-                    {challenge.difficulty}
-                  </button>
-                </div>
+                    {challenge.title}
+                  </Link>
 
-                <div className="flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-300">
-                  <span>Categorías:</span>
-                  {challenge.categories?.length ? (
-                    challenge.categories.map((category, index) => (
+                  <div className="mt-4 space-y-4">
+                    <div className="flex items-center space-x-2 text-sm">
+                      <span className="text-zinc-600 dark:text-zinc-400">Dificultad:</span>
                       <button
-                        key={index}
-                        onClick={() => handleCategoryClick(category.name)}
-                        className="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        onClick={() => handleDifficultyClick(challenge.difficulty)}
+                        className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:bg-fuchsia-50 dark:hover:bg-emerald-900/30 border-2 border-zinc-200 dark:border-zinc-700 transition-all duration-300"
                       >
-                        <Tag className="w-4 h-4 mr-1" />
-                        {category.name}
+                        <Tag className="w-4 h-4 mr-2 text-fuchsia-500 dark:text-emerald-400" />
+                        {challenge.difficulty}
                       </button>
-                    ))
-                  ) : (
-                    <span className="text-gray-400 dark:text-gray-500">- Sin categorías -</span>
-                  )}
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 text-sm">
+                      <span className="text-zinc-600 dark:text-zinc-400">Categorías:</span>
+                      {challenge.categories?.length ? (
+                        challenge.categories.map((category, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleCategoryClick(category.name)}
+                            className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:bg-fuchsia-50 dark:hover:bg-emerald-900/30 border-2 border-zinc-200 dark:border-zinc-700 transition-all duration-300"
+                          >
+                            <Tag className="w-4 h-4 mr-2 text-fuchsia-500 dark:text-emerald-400" />
+                            {category.name}
+                          </button>
+                        ))
+                      ) : (
+                        <span className="text-zinc-400 dark:text-zinc-500">- Sin categorías -</span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center space-x-2 text-sm">
+                      <span className="text-zinc-600 dark:text-zinc-400">Lenguaje:</span>
+                      <button
+                        onClick={() => handleLanguageClick(challenge.language)}
+                        className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:bg-fuchsia-50 dark:hover:bg-emerald-900/30 border-2 border-zinc-200 dark:border-zinc-700 transition-all duration-300"
+                      >
+                        <Tag className="w-4 h-4 mr-2 text-fuchsia-500 dark:text-emerald-400" />
+                        {challenge.language}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex items-center space-x-4">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleAction(challenge.id, 'like')}
+                      className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300
+                        ${challenge.user_liked
+                          ? 'bg-fuchsia-100 text-fuchsia-700 dark:bg-emerald-900/50 dark:text-emerald-300'
+                          : 'bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:bg-fuchsia-50 dark:hover:bg-emerald-900/30'
+                        } border-2 border-zinc-200 dark:border-zinc-700`}
+                    >
+                      <ThumbsUp className="w-4 h-4 mr-2" />
+                      <span>{challenge.likes_count}</span>
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleAction(challenge.id, 'dislike')}
+                      className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300
+                        ${challenge.user_disliked
+                          ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
+                          : 'bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:bg-red-50 dark:hover:bg-red-900/30'
+                        } border-2 border-zinc-200 dark:border-zinc-700`}
+                    >
+                      <ThumbsDown className="w-4 h-4 mr-2" />
+                      <span>{challenge.dislikes_count}</span>
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleAction(challenge.id, 'favorite')}
+                      className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300
+                        ${challenge.user_favorited
+                          ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-300'
+                          : 'bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:bg-cyan-50 dark:hover:bg-cyan-900/30'
+                        } border-2 border-zinc-200 dark:border-zinc-700`}
+                    >
+                      <Heart className="w-4 h-4 mr-2" />
+                      <span>Favorito</span>
+                    </motion.button>
+                  </div>
                 </div>
-
-                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
-                  <span>Lenguaje:</span>
-                  <button
-                    onClick={() => handleLanguageClick(challenge.language)}
-                    className="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                  >
-                    <Tag className="w-4 h-4 mr-1" />
-                    {challenge.language}
-                  </button>
-                </div>
-              </div>
-
-              <div className="mt-6 flex items-center space-x-4">
-                <button
-                  onClick={() => handleAction(challenge.id, 'like')}
-                  className={`inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors
-                    ${challenge.user_liked
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                      : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                >
-                  <ThumbsUp className="w-4 h-4 mr-2" />
-                  <span>{challenge.likes_count}</span>
-                </button>
-
-                <button
-                  onClick={() => handleAction(challenge.id, 'dislike')}
-                  className={`inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors
-                    ${challenge.user_disliked
-                      ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
-                      : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                >
-                  <ThumbsDown className="w-4 h-4 mr-2" />
-                  <span>{challenge.dislikes_count}</span>
-                </button>
-
-                <button
-                  onClick={() => handleAction(challenge.id, 'favorite')}
-                  className={`inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors
-                    ${challenge.user_favorited
-                      ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
-                      : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                >
-                  <Heart className="w-4 h-4 mr-2" />
-                </button>
-              </div>
-            </div>
-          </motion.li>
-        ))}
-      </motion.ul>
+              </motion.li>
+            ))}
+          </motion.ul>
+        </AnimatePresence>
+      )}
 
       <div className="mt-8 flex justify-center space-x-4">
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => fetchChallenges(pagination.previous)}
-          disabled={!pagination.previous}
-          className={`px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors
-            ${!pagination.previous && 'opacity-50 cursor-not-allowed'}`}
+          disabled={!pagination.previous || loading}
+          className={`px-6 py-2.5 rounded-lg text-sm font-medium bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-fuchsia-50 dark:hover:bg-emerald-900/30 transition-all duration-300 border-2 border-zinc-200 dark:border-zinc-700 flex items-center
+            ${(!pagination.previous || loading) && 'opacity-50 cursor-not-allowed hover:bg-white dark:hover:bg-zinc-800'}`}
         >
-          <ChevronLeft className="w-4 h-4 inline-block mr-2" />
+          <ChevronLeft className="w-4 h-4 mr-2" />
           Anterior
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => fetchChallenges(pagination.next)}
-          disabled={!pagination.next}
-          className={`px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors
-            ${!pagination.next && 'opacity-50 cursor-not-allowed'}`}
+          disabled={!pagination.next || loading}
+          className={`px-6 py-2.5 rounded-lg text-sm font-medium bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-fuchsia-50 dark:hover:bg-emerald-900/30 transition-all duration-300 border-2 border-zinc-200 dark:border-zinc-700 flex items-center
+            ${(!pagination.next || loading) && 'opacity-50 cursor-not-allowed hover:bg-white dark:hover:bg-zinc-800'}`}
         >
           Siguiente
-          <ChevronRight className="w-4 h-4 inline-block ml-2" />
-        </button>
+          <ChevronRight className="w-4 h-4 ml-2" />
+        </motion.button>
       </div>
     </div>
   );

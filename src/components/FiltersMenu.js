@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { Filter, ChevronDown, Star, ThumbsUp, Loader2, XCircle } from 'lucide-react';
+import { Filter, ChevronDown, Heart, ThumbsUp, Loader, XCircle } from 'lucide-react';
 
 const FiltersMenu = ({
     handleCategoryClick,
@@ -42,16 +42,21 @@ const FiltersMenu = ({
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center p-4 text-gray-600 dark:text-gray-300">
-                <Loader2 className="w-6 h-6 animate-spin mr-2" />
-                <span>Cargando...</span>
+            <div className="flex items-center justify-center p-6 text-zinc-600 dark:text-zinc-400">
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                    <Loader className="w-8 h-8 text-fuchsia-500 dark:text-emerald-400" />
+                </motion.div>
+                <span className="ml-3 font-medium">Cargando filtros...</span>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="text-red-500 dark:text-red-400 text-center py-4">
+            <div className="text-red-500 dark:text-red-400 text-center py-6 font-medium">
                 {error}
             </div>
         );
@@ -62,71 +67,78 @@ const FiltersMenu = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="bg-white dark:bg-gray-800 p-4 shadow-md"
+            className="bg-zinc-50 dark:bg-zinc-800 p-6 rounded-xl shadow-lg mb-8"
         >
-            <div className="flex justify-center space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+            <div className="flex flex-wrap gap-4 justify-center">
                 <SelectFilter
                     options={categories}
                     onChange={handleCategoryClick}
+                    value={filters.category}
                     placeholder="Todas las Categorías"
-                    icon={<Filter className="w-5 h-5" />}
+                    icon={<Filter className="w-4 h-4 text-fuchsia-500 dark:text-emerald-400" />}
                 />
                 <SelectFilter
                     options={languages}
                     onChange={handleLanguageClick}
+                    value={filters.language}
                     placeholder="Todos los Lenguajes"
-                    icon={<ChevronDown className="w-5 h-5" />}
+                    icon={<ChevronDown className="w-4 h-4 text-fuchsia-500 dark:text-emerald-400" />}
                 />
                 <SelectFilter
                     options={difficulties}
                     onChange={handleDifficultyClick}
+                    value={filters.difficulty}
                     placeholder="Todas las Dificultades"
-                    icon={<ChevronDown className="w-5 h-5" />}
+                    icon={<ChevronDown className="w-4 h-4 text-fuchsia-500 dark:text-emerald-400" />}
                 />
                 <ToggleButton
                     onClick={handleToggleFavorite}
                     active={filters.favorites}
-                    icon={<Star className="w-5 h-5" />}
+                    icon={<Heart className="w-4 h-4" />}
                     activeText="Ver Todos"
                     inactiveText="Ver Favoritos"
                 />
                 <ToggleButton
                     onClick={handleToggleSortbyLikes}
                     active={filters.sort_by_likes}
-                    icon={<ThumbsUp className="w-5 h-5" />}
-                    activeText="Ordenar por Relevancia"
+                    icon={<ThumbsUp className="w-4 h-4" />}
+                    activeText="Ordenar por Fecha"
                     inactiveText="Ordenar por Likes"
                 />
                 
-                {/* Botón de reset */}
                 <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleRestFilter}
-                    className="flex items-center px-4 py-2 rounded-full text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
+                    className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:bg-red-50 dark:hover:bg-red-900/30 border-2 border-zinc-200 dark:border-zinc-700 transition-all duration-300"
                 >
-                    <XCircle className="w-5 h-5 mr-2" />
-                    Restablecer Filtros
+                    <XCircle className="w-4 h-4 mr-2 text-red-500 dark:text-red-400" />
+                    Restablecer
                 </motion.button>
             </div>
         </motion.div>
     );
 };
 
-const SelectFilter = ({ options, onChange, placeholder, icon }) => (
+const SelectFilter = ({ options, onChange, value, placeholder, icon }) => (
     <div className="relative">
         <select
+            value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="appearance-none w-full bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-600 focus:border-gray-500 dark:focus:border-gray-500"
+            className="appearance-none w-full min-w-[200px] px-4 py-2 pr-10 rounded-lg text-sm font-medium bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border-2 border-zinc-200 dark:border-zinc-700 focus:outline-none focus:border-fuchsia-500 dark:focus:border-emerald-400 transition-all duration-300"
         >
             <option value="">{placeholder}</option>
             {options.map((option) => (
-                <option key={option.name || option.grado} value={option.name || option.grado}>
+                <option 
+                    key={option.name || option.grado} 
+                    value={option.name || option.grado}
+                    className="py-2"
+                >
                     {option.name || option.grado}
                 </option>
             ))}
         </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-200">
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3">
             {icon}
         </div>
     </div>
@@ -137,14 +149,20 @@ const ToggleButton = ({ onClick, active, icon, activeText, inactiveText }) => (
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={onClick}
-        className={`flex items-center px-4 py-2 rounded-full transition-colors duration-200 ${
+        className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
             active
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'
+                ? 'bg-fuchsia-100 text-fuchsia-700 dark:bg-emerald-900/50 dark:text-emerald-300 border-2 border-fuchsia-200 dark:border-emerald-700'
+                : 'bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:bg-fuchsia-50 dark:hover:bg-emerald-900/30 border-2 border-zinc-200 dark:border-zinc-700'
         }`}
     >
-        {icon}
-        <span className="ml-2">{active ? activeText : inactiveText}</span>
+        {React.cloneElement(icon, {
+            className: `w-4 h-4 mr-2 ${
+                active
+                    ? 'text-fuchsia-500 dark:text-emerald-400'
+                    : 'text-zinc-600 dark:text-zinc-400'
+            }`
+        })}
+        <span>{active ? activeText : inactiveText}</span>
     </motion.button>
 );
 

@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Moon, Sun, Rocket, Trophy } from "lucide-react";
 import ScrollToggle from "../hooks/ScrollToggle ";
-import LogoutButton from "./LogoutButton"
+import LogoutButton from "./LogoutButton";
 
 export default function NavBar() {
   const { isAuthenticated } = useAuth();
@@ -16,9 +16,62 @@ export default function NavBar() {
     document.documentElement.classList.toggle('dark');
   };
 
+  // Updated animation variants for the menu
   const menuVariants = {
-    open: { opacity: 1, x: 0 },
-    closed: { opacity: 0, x: "100%" }
+    initial: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    },
+    animate: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+        staggerChildren: 0.1
+      }
+    },
+    exit: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+        staggerChildren: 0.05,
+        staggerDirection: -1
+      }
+    }
+  };
+
+  const itemVariants = {
+    initial: {
+      opacity: 0,
+      y: 20,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    },
+    exit: {
+      opacity: 0,
+      y: -20,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    }
   };
 
   return (
@@ -87,54 +140,81 @@ export default function NavBar() {
               onClick={() => setIsOpen(!isOpen)}
               className="md:hidden p-3 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all duration-300"
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              <motion.div
+                animate={isOpen ? "open" : "closed"}
+                variants={{
+                  open: { rotate: 180 },
+                  closed: { rotate: 0 }
+                }}
+                transition={{ duration: 0.3 }}
+              >
+                {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </motion.div>
             </motion.button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        <AnimatePresence>
+        {/* Mobile Navigation - Updated Animation */}
+        <AnimatePresence mode="wait">
           {isOpen && (
             <motion.div
-              initial="closed"
-              animate="open"
-              exit="closed"
+              initial="initial"
+              animate="animate"
+              exit="exit"
               variants={menuVariants}
-              className="fixed inset-y-0 right-0 w-full bg-white dark:bg-zinc-900 md:hidden pt-20"
+              className="md:hidden overflow-hidden bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800"
             >
-              <div className="px-6 py-8 space-y-6">
+              <motion.div className="px-4 py-6 space-y-4">
                 {isAuthenticated ? (
                   <>
-                    <Link
-                      to="challenges/"
-                      className="flex items-center gap-2 text-zinc-800 hover:text-cyan-500 dark:text-zinc-200 dark:hover:text-emerald-400 transition-all duration-300 text-xl font-medium"
-                    >
-                      Challenges
-                      <Trophy className="h-6 w-6" />
-                    </Link>
-                    <LogoutButton className="w-full bg-fuchsia-500 hover:bg-cyan-500 dark:bg-emerald-400 dark:hover:bg-fuchsia-400 text-white px-6 py-3 rounded-md transition-all duration-300 text-lg font-medium text-center" />
+                    <motion.div variants={itemVariants}>
+                      <Link
+                        to="challenges/"
+                        className="flex items-center gap-2 p-3 rounded-lg text-zinc-800 hover:text-white dark:text-zinc-200 hover:bg-fuchsia-500 dark:hover:bg-emerald-400 transition-all duration-300 text-lg font-medium"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Trophy className="h-6 w-6" />
+                        Challenges
+                      </Link>
+                    </motion.div>
+                    <motion.div variants={itemVariants}>
+                      <LogoutButton 
+                        className="w-full bg-fuchsia-500 hover:bg-cyan-500 dark:bg-emerald-400 dark:hover:bg-fuchsia-400 text-white p-3 rounded-lg transition-all duration-300 text-lg font-medium text-center"
+                        onClick={() => setIsOpen(false)}
+                      />
+                    </motion.div>
                   </>
                 ) : (
                   <>
-                    <Link
-                      to="/login"
-                      className="block text-zinc-800 hover:text-cyan-500 dark:text-zinc-200 dark:hover:text-emerald-400 transition-colors duration-300 text-xl font-medium"
-                    >
-                      Sign In
-                    </Link>
-                    <Link
-                      to="/register"
-                      className="block w-full px-6 py-3 rounded-md bg-fuchsia-500 hover:bg-cyan-500 dark:bg-emerald-400 dark:hover:bg-fuchsia-400 text-white transition-all duration-300 text-lg font-medium text-center"
-                    >
-                      Register
-                    </Link>
+                    <motion.div variants={itemVariants}>
+                      <Link
+                        to="/login"
+                        className="flex items-center gap-2 p-3 rounded-lg text-zinc-800 hover:text-white dark:text-zinc-200 hover:bg-fuchsia-500 dark:hover:bg-emerald-400 transition-all duration-300 text-lg font-medium"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Sign In
+                      </Link>
+                    </motion.div>
+                    <motion.div variants={itemVariants}>
+                      <Link
+                        to="/register"
+                        className="flex items-center gap-2 p-3 rounded-lg bg-fuchsia-500 hover:bg-cyan-500 dark:bg-emerald-400 dark:hover:bg-fuchsia-400 text-white transition-all duration-300 text-lg font-medium"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Register
+                      </Link>
+                    </motion.div>
                   </>
                 )}
 
                 {/* Mobile Dark Mode Toggle */}
-                <button
-                  onClick={toggleDark}
-                  className="w-full p-4 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all duration-300 flex items-center justify-center space-x-3 text-lg font-medium"
+                <motion.button
+                  variants={itemVariants}
+                  onClick={() => {
+                    toggleDark();
+                    setIsOpen(false);
+                  }}
+                  className="w-full p-3 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all duration-300 flex items-center justify-center gap-3 text-lg font-medium"
                 >
                   {isDark ? (
                     <>
@@ -147,8 +227,8 @@ export default function NavBar() {
                       <span>Dark Mode</span>
                     </>
                   )}
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
