@@ -13,6 +13,7 @@ const ChallengeDetail = () => {
   const [compiling, setCompiling] = useState(false);  
   const [testResults, setTestResults] = useState(null); 
   const [testing, setTesting] = useState(false);  
+  const [saving, setSaving] = useState(false); // Estado para indicar si se está guardando la solución.
 
   useEffect(() => {
     const fetchChallenge = async () => {
@@ -98,6 +99,29 @@ const ChallengeDetail = () => {
     }
   };
 
+  const handleSaveSolution = async () => {
+    setSaving(true);
+
+    const token = localStorage.getItem('access_token');
+    try {
+      await axios.post(
+        `http://localhost:8000/beta/challenges/challenges/${id}/save-solution/`,
+        { solution: solutionCode },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      alert('¡Solución guardada exitosamente!');
+    } catch (err) {
+      console.error('Error al guardar la solución:', err);
+      alert('Hubo un error al guardar la solución.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) return <p>Cargando desafío...</p>;
   if (error) return <p>{error}</p>;
 
@@ -141,6 +165,14 @@ const ChallengeDetail = () => {
         ) : (
           <p>Tests no disponibles para este lenguaje.</p>
         )}
+
+        <button 
+          onClick={handleSaveSolution}
+          disabled={saving}
+          className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
+        >
+          {saving ? 'Guardando...' : 'Guardar Solución'}
+        </button>
 
         {testResults && (
           <div>
