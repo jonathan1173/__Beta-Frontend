@@ -185,7 +185,7 @@ export default function ChallengesList() {
               <motion.li
                 key={challenge.id}
                 variants={item}
-                className="bg-zinc-50 dark:bg-zinc-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
+                className="bg-zinc-300 dark:bg-zinc-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
               >
                 <div className="p-6">
                   <Link

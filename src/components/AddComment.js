@@ -18,7 +18,7 @@ const AddComment = ({ challengeId, onCommentAdded }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8000/beta/challenges/challenges/${challengeId}/comments/add`,
+        `https://beta-api-cs50.vercel.app/beta/challenges/challenges/${challengeId}/comments/add`,
         { content },
         {
           headers: {

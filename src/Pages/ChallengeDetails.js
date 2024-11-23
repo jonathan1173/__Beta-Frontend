@@ -65,7 +65,7 @@ const ChallengeDetail = () => {
     const token = localStorage.getItem('access_token');
     try {
       const response = await axios.post(
-        'http://127.0.0.1:8000/beta/challenges/execute/',
+        'https://beta-api-cs50.vercel.app/beta/challenges/execute/',
         {
           language: challenge.language || 'python',
           code: solutionCode,
@@ -89,7 +89,7 @@ const ChallengeDetail = () => {
     const token = localStorage.getItem('access_token');
     try {
       const response = await axios.post(
-        'http://localhost:8000/beta/challenges/code-test/',
+        'https://beta-api-cs50.vercel.app/beta/challenges/code-test/',
         {
           challenge_id: id,
           solution: solutionCode,
@@ -111,7 +111,7 @@ const ChallengeDetail = () => {
     const token = localStorage.getItem('access_token');
     try {
       await axios.post(
-        `http://localhost:8000/beta/challenges/challenges/${id}/save-solution/`,
+        `https://beta-api-cs50.vercel.app/beta/challenges/challenges/${id}/save-solution/`,
         { solution: solutionCode },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -191,7 +191,7 @@ const ChallengeDetail = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 md:p-6 shadow-lg"
+                className="bg-zinc-300 dark:bg-zinc-800 rounded-xl p-4 md:p-6 shadow-lg"
               >
                 <h1 className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-white mb-4 md:mb-6">
                   {challenge.title}
@@ -248,7 +248,7 @@ const ChallengeDetail = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 md:p-6 shadow-lg"
+                className="bg-zinc-300 dark:bg-zinc-800 rounded-xl p-4 md:p-6 shadow-lg"
               >
                 <ChallengeComments challengeId={id} />
               </motion.div>
@@ -256,9 +256,9 @@ const ChallengeDetail = () => {
           </AnimatePresence>
         </div>
 
-        {/* Right Panel - Code Editor */}
+        
         <div className="w-full lg:w-1/2 space-y-4 md:space-y-6">
-          <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 md:p-6 shadow-lg">
+          <div className="bg-zinc-300 dark:bg-zinc-800 rounded-xl p-4 md:p-6 shadow-lg">
             <h2 className="text-lg md:text-xl font-bold text-zinc-900 dark:text-white mb-4">Solución</h2>
             
             <div className="mb-4">
@@ -327,12 +327,12 @@ const ChallengeDetail = () => {
                       ) : (
                         <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
                       )}
-                      <div className="min-w-0 flex-1"> {/* Added min-w-0 and flex-1 to contain children */}
+                      <div className="min-w-0 flex-1"> 
                         <strong className="text-sm md:text-base text-zinc-900 dark:text-white block truncate">
                           {test.test_name}
                         </strong>
                         <div className="mt-2 relative">
-                          <pre className="text-xs md:text-sm text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800 p-2 rounded w-full overflow-x-auto">
+                          <pre className="text-xs md:text-sm text-zinc-700 dark:text-zinc-300 bg-zinc-300 dark:bg-zinc-800 p-2 rounded w-full overflow-x-auto">
                             {test.output}
                           </pre>
                         </div>

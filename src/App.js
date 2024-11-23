@@ -9,7 +9,7 @@ import NavBar from './components/NavBar';
 import PrivateRoute from './contexts/PrivateRoute';
 import Home from './Pages/Home';
 import ChallengesList from './Pages/ChallengesList';
-import Layout from './layouts/Layout'; // Asegúrate de tener este componente creado
+import Layout from './layouts/Layout'; 
 import ChallengeDetails from './Pages/ChallengeDetails';
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
     <BrowserRouter>
       <DarkModeProvider>
         <AuthProvider>
-          <Layout> {/* Aquí engloba los componentes con Layout */}
+          <Layout>
             <NavBar />
             <Routes>
               <Route path="/" element={<Home />} />

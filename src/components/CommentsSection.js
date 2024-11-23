@@ -14,7 +14,7 @@ const CommentsSection = ({ challengeId, onNewComment }) => {
       const token = localStorage.getItem("access_token");
       try {
         const response = await axios.get(
-          `http://localhost:8000/beta/challenges/challenges/${challengeId}/comments/?page=1`,
+          `https://beta-api-cs50.vercel.app/beta/challenges/challenges/${challengeId}/comments/?page=1`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

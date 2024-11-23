@@ -67,7 +67,7 @@ const FiltersMenu = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="bg-zinc-50 dark:bg-zinc-800 p-6 rounded-xl shadow-lg mb-8"
+            className="bg-zinc-300 dark:bg-zinc-800 p-6 rounded-xl shadow-lg mb-8"
         >
             <div className="flex flex-wrap gap-4 justify-center">
                 <SelectFilter
