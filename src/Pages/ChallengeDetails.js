@@ -9,8 +9,10 @@ const ChallengeDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [solutionCode, setSolutionCode] = useState('');
-  const [output, setOutput] = useState('');  // Para mostrar la salida de la ejecución
-  const [compiling, setCompiling] = useState(false);  // Para saber si está en proceso de compilación
+  const [output, setOutput] = useState('');  
+  const [compiling, setCompiling] = useState(false);  
+  const [testResults, setTestResults] = useState(null); 
+  const [testing, setTesting] = useState(false);  
 
   useEffect(() => {
     const fetchChallenge = async () => {
@@ -44,15 +46,15 @@ const ChallengeDetail = () => {
   };
 
   const handleCompile = async () => {
-    setCompiling(true);  // Comienza el proceso de compilación
-    setOutput('');  // Limpiar cualquier salida previa
+    setCompiling(true);  
+    setOutput('');  
 
     const token = localStorage.getItem('access_token');
     try {
       const response = await axios.post(
-        'http://127.0.0.1:8000/beta/challenges/execute/',  // URL del backend
+        'http://127.0.0.1:8000/beta/challenges/execute/',  
         {
-          language: challenge.language || 'python',  // Si no tiene lenguaje, por defecto 'python'
+          language: challenge.language || 'python',  
           code: solutionCode,
         },
         {
@@ -61,18 +63,45 @@ const ChallengeDetail = () => {
           },
         }
       );
-      console.log('Respuesta de la ejecución:', response.data);
       setOutput(response.data.run.stdout || 'No se generó salida.');
     } catch (err) {
-      console.error('Error al ejecutar el código:', err);
       setOutput('Error al ejecutar el código.');
     } finally {
-      setCompiling(false);  // Termina el proceso de compilación
+      setCompiling(false);  
+    }
+  };
+
+  const handleTest = async () => {
+    setTesting(true);
+    setTestResults(null); 
+
+    const token = localStorage.getItem('access_token');
+    try {
+      const response = await axios.post(
+        'http://localhost:8000/beta/challenges/code-test/',
+        {
+          challenge_id: id,
+          solution: solutionCode,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setTestResults(response.data);
+    } catch (err) {
+      console.error('Error al ejecutar los tests:', err);
+      setTestResults({ message: 'Error al ejecutar los tests.' });
+    } finally {
+      setTesting(false);
     }
   };
 
   if (loading) return <p>Cargando desafío...</p>;
   if (error) return <p>{error}</p>;
+
+  const isTestAvailable = ['python', 'javascript'].includes(challenge.language.toLowerCase());
 
   return (
     <div className="flex">
@@ -95,12 +124,37 @@ const ChallengeDetail = () => {
         />
         <button 
           onClick={handleCompile}
-          disabled={compiling} // Desactiva el botón mientras se compila
+          disabled={compiling} 
         >
           {compiling ? 'Compilando...' : 'Compilar'}
         </button>
         <p><strong>Salida:</strong></p>
         <pre>{output}</pre>
+
+        {isTestAvailable ? (
+          <button 
+            onClick={handleTest}
+            disabled={testing}
+          >
+            {testing ? 'Ejecutando Tests...' : 'Probar Código'}
+          </button>
+        ) : (
+          <p>Tests no disponibles para este lenguaje.</p>
+        )}
+
+        {testResults && (
+          <div>
+            <p><strong>Resultado de los Tests:</strong> {testResults.message}</p>
+            <ul>
+              {testResults.test_results.map((test, index) => (
+                <li key={index}>
+                  <strong>{test.test_name}:</strong> {test.status === 'passed' ? '✅' : '❌'}
+                  <pre>{test.output}</pre>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
     </div>
   );
