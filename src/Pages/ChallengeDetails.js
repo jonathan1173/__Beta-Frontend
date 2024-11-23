@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import CodeEditor from '../services/CodeEditor';
+// import CommentsSection from '../components/CommentsSection';
+// import AddComment from '../components/AddComment';
+import ChallengeComments from '../components/ChallengeComments';
 
 const ChallengeDetail = () => {
   const { id } = useParams();
@@ -9,11 +12,11 @@ const ChallengeDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [solutionCode, setSolutionCode] = useState('');
-  const [output, setOutput] = useState('');  
-  const [compiling, setCompiling] = useState(false);  
-  const [testResults, setTestResults] = useState(null); 
-  const [testing, setTesting] = useState(false);  
-  const [saving, setSaving] = useState(false); // Estado para indicar si se está guardando la solución.
+  const [output, setOutput] = useState('');
+  const [compiling, setCompiling] = useState(false);
+  const [testResults, setTestResults] = useState(null);
+  const [testing, setTesting] = useState(false);
+  const [saving, setSaving] = useState(false); 
 
   useEffect(() => {
     const fetchChallenge = async () => {
@@ -21,14 +24,14 @@ const ChallengeDetail = () => {
 
       try {
         const response = await axios.get(
-          `https://beta-api-cs50.vercel.app/beta/challenges/challenges/${id}/`, 
+          `https://beta-api-cs50.vercel.app/beta/challenges/challenges/${id}/`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        console.log('Datos recibidos:', response.data);
+        // console.log('Datos recibidos:', response.data);
         setChallenge(response.data);
         setSolutionCode(response.data.solution || '');
       } catch (err) {
@@ -47,15 +50,15 @@ const ChallengeDetail = () => {
   };
 
   const handleCompile = async () => {
-    setCompiling(true);  
-    setOutput('');  
+    setCompiling(true);
+    setOutput('');
 
     const token = localStorage.getItem('access_token');
     try {
       const response = await axios.post(
-        'http://127.0.0.1:8000/beta/challenges/execute/',  
+        'http://127.0.0.1:8000/beta/challenges/execute/',
         {
-          language: challenge.language || 'python',  
+          language: challenge.language || 'python',
           code: solutionCode,
         },
         {
@@ -68,13 +71,13 @@ const ChallengeDetail = () => {
     } catch (err) {
       setOutput('Error al ejecutar el código.');
     } finally {
-      setCompiling(false);  
+      setCompiling(false);
     }
   };
 
   const handleTest = async () => {
     setTesting(true);
-    setTestResults(null); 
+    setTestResults(null);
 
     const token = localStorage.getItem('access_token');
     try {
@@ -127,6 +130,7 @@ const ChallengeDetail = () => {
 
   const isTestAvailable = ['python', 'javascript'].includes(challenge.language.toLowerCase());
 
+
   return (
     <div className="flex">
       <section className="w-[50%]">
@@ -138,17 +142,22 @@ const ChallengeDetail = () => {
         <p><strong>Likes:</strong> {challenge.likes_count}</p>
         <p><strong>Dislikes:</strong> {challenge.dislikes_count}</p>
       </section>
+      {/* <AddComment challengeId={id}/>
+      <CommentsSection challengeId={id} />
+       */}
 
+      <ChallengeComments challengeId={id}/>
       <section className="w-[50%]">
         <h2>Solución</h2>
         <CodeEditor
-          value={solutionCode}
+          value={solutionCode} 
           onChange={handleSolutionChange}
           language={challenge.language || 'python'}
         />
-        <button 
+
+        <button
           onClick={handleCompile}
-          disabled={compiling} 
+          disabled={compiling}
         >
           {compiling ? 'Compilando...' : 'Compilar'}
         </button>
@@ -156,7 +165,7 @@ const ChallengeDetail = () => {
         <pre>{output}</pre>
 
         {isTestAvailable ? (
-          <button 
+          <button
             onClick={handleTest}
             disabled={testing}
           >
@@ -166,7 +175,7 @@ const ChallengeDetail = () => {
           <p>Tests no disponibles para este lenguaje.</p>
         )}
 
-        <button 
+        <button
           onClick={handleSaveSolution}
           disabled={saving}
           className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
@@ -191,5 +200,6 @@ const ChallengeDetail = () => {
     </div>
   );
 };
+
 
 export default ChallengeDetail;
