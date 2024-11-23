@@ -1,5 +1,12 @@
+tema claro 
 #AB7052 → bg-amber-600
 #667519 → bg-olive-700
 #7D9B6E → bg-green-400
 #88B3E8 → bg-blue-400
 #D29742 → bg-yellow-500 
+tema oscuro 
+#AB7052 (bg-amber-600) → #D17A56 (bg-amber-700, tono más oscuro)
+#667519 (bg-olive-700) → #4F5B16 (bg-olive-800, tono más oscuro)
+#7D9B6E (bg-green-400) → #5B7C4C (bg-green-500, tono más oscuro)
+#88B3E8 (bg-blue-400) → #6B92C8 (bg-blue-500, tono más oscuro)
+#D29742 (bg-yellow-500) → #C68B30 (bg-yellow-600, tono más oscuro)

@@ -1,12 +1,11 @@
 import React from 'react';
+import TopUsers from '../components/TopUsers';
 
 const Dashboard = () => {
   return (
     <div>
-      <h1 className='h-[100vh]'>Dashboard </h1>
-      <h1 className='h-[100vh]'>Dashboard </h1>
-      <h1 className='h-[100vh]'>Dashboard </h1>
-      <h1 className='h-[100vh]'>Dashboard </h1>
+      <h1 className=''>Dashboard </h1>
+      <TopUsers/>
     </div>
   );
 };

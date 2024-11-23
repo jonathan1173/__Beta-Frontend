@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Moon, Sun, Rocket } from "lucide-react";
+import { Menu, X, Moon, Sun, Rocket, Trophy } from "lucide-react";
 import ScrollToggle from "../hooks/ScrollToggle ";
+import LogoutButton from "./LogoutButton"
 
 export default function NavBar() {
   const { isAuthenticated } = useAuth();
@@ -22,147 +23,138 @@ export default function NavBar() {
 
   return (
     <ScrollToggle>
-
-    <header className=" fixed w-full bg-white dark:bg-gray-900 shadow-lg z-50 transition-colors duration-300">
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          {/* Logo */}
-          <Link to="/dashboard" className="flex items-center space-x-2">
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Rocket className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
-            </motion.div>
-            <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
-              Beta
-            </span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-4">
-            {isAuthenticated ? (
-              <motion.div className="flex items-center space-x-4">
-                <Link 
-                  to="challenges/"
-                  className="text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                >
-                  Challenges
-                </Link>
-                <button
-                  onClick={() => {/* Logout logic */}}
-                  className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors"
-                >
-                  Logout
-                </button>
+      <header className="fixed w-full bg-white dark:bg-zinc-900 shadow-lg z-50 transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-20 items-center">
+            {/* Logo */}
+            <Link to="/dashboard" className="flex items-center space-x-3 group">
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 360 }}
+                whileTap={{ scale: 0.95 }}
+                className="transition-transform duration-300"
+              >
+                <Rocket className="h-8 w-8 text-fuchsia-500 group-hover:text-cyan-500 dark:text-emerald-400 dark:group-hover:text-fuchsia-400 transition-colors duration-300" />
               </motion.div>
-            ) : (
-              <motion.div className="flex items-center space-x-4">
-                <Link 
-                  to="/login"
-                  className="text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                >
-                  Sign In
-                </Link>
-                <Link 
-                  to="/register"
-                  className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors"
-                >
-                  Register
-                </Link>
-              </motion.div>
-            )}
-            
-            {/* Dark Mode Toggle */}
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={toggleDark}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200"
-            >
-              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </motion.button>
-          </nav>
+              <span className="text-2xl font-bold text-zinc-900 group-hover:text-fuchsia-500 dark:text-white dark:group-hover:text-emerald-400 transition-colors duration-300">
+                Beta
+              </span>
+            </Link>
 
-          {/* Mobile Menu Button */}
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-          >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </motion.button>
-        </div>
-      </div>
-
-      {/* Mobile Navigation */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial="closed"
-            animate="open"
-            exit="closed"
-            variants={menuVariants}
-            className="fixed inset-y-0 right-0 w-full bg-white dark:bg-gray-900 md:hidden"
-          >
-            <div className="px-4 py-6 space-y-4">
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-6">
               {isAuthenticated ? (
-                <>
-                  <Link 
+                <motion.div className="flex items-center space-x-6">
+                  <Link
                     to="challenges/"
-                    className="block text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                    className="flex items-center gap-2 text-zinc-800 hover:text-cyan-500 dark:text-zinc-200 dark:hover:text-emerald-400 transition-all duration-300 text-lg font-medium"
                   >
                     Challenges
+                    <Trophy className="h-5 w-5" />
                   </Link>
-                  <button
-                    onClick={() => {/* Logout logic */}}
-                    className="w-full px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors"
-                  >
-                    Logout
-                  </button>
-                </>
+                  <LogoutButton className="bg-fuchsia-500 hover:bg-cyan-500 dark:bg-emerald-400 dark:hover:bg-fuchsia-400 text-white px-6 py-2.5 rounded-md transition-all duration-300 transform hover:scale-105" />
+                </motion.div>
               ) : (
-                <>
-                  <Link 
+                <motion.div className="flex items-center space-x-6">
+                  <Link
                     to="/login"
-                    className="block text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                    className="text-zinc-800 hover:text-cyan-500 dark:text-zinc-200 dark:hover:text-emerald-400 transition-colors duration-300 text-lg font-medium"
                   >
                     Sign In
                   </Link>
-                  <Link 
+                  <Link
                     to="/register"
-                    className="block px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors text-center"
+                    className="px-6 py-2.5 rounded-md bg-fuchsia-500 hover:bg-cyan-500 dark:bg-emerald-400 dark:hover:bg-fuchsia-400 text-white transition-all duration-300 transform hover:scale-105 font-medium"
                   >
                     Register
                   </Link>
-                </>
+                </motion.div>
               )}
-              
-              {/* Mobile Dark Mode Toggle */}
-              <button
+
+              {/* Dark Mode Toggle */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={toggleDark}
-                className="w-full p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 flex items-center justify-center"
+                className="p-3 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all duration-300"
               >
-                {isDark ? (
+                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </motion.button>
+            </nav>
+
+            {/* Mobile Menu Button */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden p-3 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all duration-300"
+            >
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </motion.button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial="closed"
+              animate="open"
+              exit="closed"
+              variants={menuVariants}
+              className="fixed inset-y-0 right-0 w-full bg-white dark:bg-zinc-900 md:hidden pt-20"
+            >
+              <div className="px-6 py-8 space-y-6">
+                {isAuthenticated ? (
                   <>
-                    <Sun className="h-5 w-5 mr-2" />
-                    <span>Light Mode</span>
+                    <Link
+                      to="challenges/"
+                      className="flex items-center gap-2 text-zinc-800 hover:text-cyan-500 dark:text-zinc-200 dark:hover:text-emerald-400 transition-all duration-300 text-xl font-medium"
+                    >
+                      Challenges
+                      <Trophy className="h-6 w-6" />
+                    </Link>
+                    <LogoutButton className="w-full bg-fuchsia-500 hover:bg-cyan-500 dark:bg-emerald-400 dark:hover:bg-fuchsia-400 text-white px-6 py-3 rounded-md transition-all duration-300 text-lg font-medium text-center" />
                   </>
                 ) : (
                   <>
-                    <Moon className="h-5 w-5 mr-2" />
-                    <span>Dark Mode</span>
+                    <Link
+                      to="/login"
+                      className="block text-zinc-800 hover:text-cyan-500 dark:text-zinc-200 dark:hover:text-emerald-400 transition-colors duration-300 text-xl font-medium"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="block w-full px-6 py-3 rounded-md bg-fuchsia-500 hover:bg-cyan-500 dark:bg-emerald-400 dark:hover:bg-fuchsia-400 text-white transition-all duration-300 text-lg font-medium text-center"
+                    >
+                      Register
+                    </Link>
                   </>
                 )}
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
 
-    <div className="h-16"></div>
+                {/* Mobile Dark Mode Toggle */}
+                <button
+                  onClick={toggleDark}
+                  className="w-full p-4 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all duration-300 flex items-center justify-center space-x-3 text-lg font-medium"
+                >
+                  {isDark ? (
+                    <>
+                      <Sun className="h-6 w-6" />
+                      <span>Light Mode</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="h-6 w-6" />
+                      <span>Dark Mode</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+
+      <div className="h-20"></div>
     </ScrollToggle>
   );
 }

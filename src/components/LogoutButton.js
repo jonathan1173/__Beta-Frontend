@@ -1,7 +1,8 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate  } from 'react-router-dom';
 import { motion } from "framer-motion"
+import {LogOut    } from "lucide-react";
 
 const LogoutButton = () => {
   const { logout } = useAuth();
@@ -18,8 +19,9 @@ const LogoutButton = () => {
       whileTap={{ scale: 0.95 }}
     >
 
-      <button onClick={handleLogout} className="bg-red-500 hover:bg-red-700 transition-colors  flex items-center space-x-2 px-3 py-2 rounded-md">
+      <button onClick={handleLogout} className="flex gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-colors">
         Cerrar sesión
+      <LogOut     color="currentColor" />
       </button>
     </motion.div>
   );
