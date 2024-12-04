@@ -109,17 +109,25 @@ export default function NavBar() {
               ) : (
                 <motion.div className="flex items-center space-x-6">
                   <Link
+                    to="/contact"
+                    className="text-zinc-800 hover:text-cyan-500 dark:text-zinc-200 dark:hover:text-emerald-400 transition-colors duration-300 text-lg font-medium"
+                  >Contact
+                  </Link>
+                  <Link
                     to="/login"
                     className="text-zinc-800 hover:text-cyan-500 dark:text-zinc-200 dark:hover:text-emerald-400 transition-colors duration-300 text-lg font-medium"
                   >
                     Sign In
                   </Link>
+
                   <Link
                     to="/register"
                     className="px-6 py-2.5 rounded-md bg-fuchsia-500 hover:bg-cyan-500 dark:bg-emerald-400 dark:hover:bg-fuchsia-400 text-white transition-all duration-300 transform hover:scale-105 font-medium"
                   >
                     Register
                   </Link>
+
+                  
                 </motion.div>
               )}
 
@@ -195,6 +203,16 @@ export default function NavBar() {
                         Sign In
                       </Link>
                     </motion.div>
+                    <motion.div variants={itemVariants}>
+                      <Link
+                        to="/contact"
+                        className="flex items-center gap-2 p-3 rounded-lg text-zinc-800 hover:text-white dark:text-zinc-200 hover:bg-fuchsia-500 dark:hover:bg-emerald-400 transition-all duration-300 text-lg font-medium"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Contact
+                      </Link>
+                    </motion.div>
+
                     <motion.div variants={itemVariants}>
                       <Link
                         to="/register"

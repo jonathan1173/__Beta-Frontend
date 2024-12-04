@@ -11,6 +11,7 @@ import Home from './Pages/Home';
 import ChallengesList from './Pages/ChallengesList';
 import Layout from './layouts/Layout'; 
 import ChallengeDetails from './Pages/ChallengeDetails';
+import Contact from './Pages/Contact';
 
 function App() {
   return (
@@ -23,6 +24,8 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/contact" element={<Contact />} />
+
 
               {/* Ruta privada */}
               <Route element={<PrivateRoute />}>
